@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>My Ride Bookings</h2>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Pickup</th>
+            <th>Dropoff</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ride in rides %}
+        <tr>
+            <td>{{ ride.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+            <td>{{ ride.pickup_location }}</td>
+            <td>{{ ride.dropoff_location }}</td>
+            <td><span class="badge {{ ride.status.lower() }}">{{ ride.status }}</span></td>
+            <td>
+                {% if ride.status == 'Pending' %}
+                <form action="{{ url_for('cancel_ride', ride_id=ride._id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn-danger-sm">Cancel</button>
+                </form>
+                {% else %}
+                -
+                {% endif %}
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5">No rides found. <a href="{{ url_for('ride_request') }}">Book one now</a>.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

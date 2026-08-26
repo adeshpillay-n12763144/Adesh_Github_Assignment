@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="brand-title">Admin Dashboard</h1>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Passenger</th>
+            <th>Route</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ride in rides %}
+        <tr>
+            <td>{{ ride.passenger_name }}</td>
+            <td>{{ ride.pickup_location }} ➔ {{ ride.dropoff_location }}</td>
+            <td><span class="badge {{ ride.status.lower() }}">{{ ride.status }}</span></td>
+            <td>
+                {% if ride.status == 'Pending' %}
+                <form action="{{ url_for('approve_ride', ride_id=ride._id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn-approve-sm">Approve</button>
+                </form>
+                {% endif %}
+                <form action="{{ url_for('delete_ride', ride_id=ride._id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Delete record?');">
+                    <button type="submit" class="btn-danger-sm">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" style="text-align: center; color: var(--text-sub);">No records found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

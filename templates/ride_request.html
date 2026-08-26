@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="form-card">
+    <h2>Request a Ride</h2>
+    <form method="POST">
+        <label>Pickup Location</label>
+        <input type="text" name="pickup_location" required placeholder="Enter pickup address">
+        <label>Dropoff Location</label>
+        <input type="text" name="dropoff_location" required placeholder="Enter destination">
+        <label>Notes for Driver</label>
+        <textarea name="notes" placeholder="Optional notes..."></textarea>
+        <button type="submit" class="btn-primary">Submit Ride Request</button>
+    </form>
+</div>
+{% endblock %}
