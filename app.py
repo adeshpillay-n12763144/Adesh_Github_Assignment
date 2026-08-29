@@ -1,6 +1,5 @@
 import os
-
-from pymongo import MongoClient
+import certifi
 from datetime import datetime
 from functools import wraps
 from flask import Flask, render_template, request, redirect, url_for, session, flash
@@ -16,8 +15,10 @@ MONGO_URI = os.environ.get(
     "MONGO_URI", 
     "mongodb+srv://n12763144_db_user:eMQ7IyU0dbCXa8tc@ridex.wcwz91s.mongodb.net/ridex_db?appName=Ridex"
 )
-client = MongoClient(MONGO_URI)
-db = client.get_database()  # Au
+
+# Added tlsCAFile=certifi.where() to fix SSL handshake failure on EC2
+client = MongoClient(MONGO_URI, tlsCAFile=certifi.where())
+db = client.get_database()
 
 users_col = db["users"]
 rides_col = db["rides"]
