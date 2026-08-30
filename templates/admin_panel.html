@@ -1,3 +1,6 @@
+
+<!-- Basic layout implementation of the admin panel -->
+
 {% extends 'base.html' %}
 {% block content %}
 <h1 class="brand-title">Admin Dashboard</h1>
@@ -15,7 +18,7 @@
         {% for ride in rides %}
         <tr>
             <td>{{ ride.passenger_name }}</td>
-            <td>{{ ride.pickup_location }} ➔ {{ ride.dropoff_location }}</td>
+            <td>{{ ride.pickup_location }} &#10141; {{ ride.dropoff_location }}</td>
             <td><span class="badge {{ ride.status.lower() }}">{{ ride.status }}</span></td>
             <td>
                 {% if ride.status == 'Pending' %}

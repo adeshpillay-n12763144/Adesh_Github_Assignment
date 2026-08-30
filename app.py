@@ -1,3 +1,5 @@
+# Essentail Libraries for Ridex Application
+from datetime import datetime, timezone
 import os
 import certifi
 from datetime import datetime
@@ -10,13 +12,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "ridex_super_secret_key_2026")
 
-# MongoDB Setup
+# MongoDB Database setup 
 MONGO_URI = os.environ.get(
     "MONGO_URI", 
     "mongodb+srv://n12763144_db_user:eMQ7IyU0dbCXa8tc@ridex.wcwz91s.mongodb.net/ridex_db?appName=Ridex"
 )
 
-# Added tlsCAFile=certifi.where() to fix SSL handshake failure on EC2
+# Added this  to fix SSL handshake failure on EC2
 client = MongoClient(MONGO_URI, tlsCAFile=certifi.where())
 db = client.get_database()
 
@@ -26,7 +28,7 @@ rides_col = db["rides"]
 # Indexes for quick query matching
 users_col.create_index("email", unique=True)
 
-# Authentication Helpers
+# role based Authentication setup
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -45,8 +47,9 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# --- AUTHENTICATION ROUTES (ADESH-28 & ADESH-29) ---
+#view or routes calls for differents pages
 
+#main page
 @app.route("/")
 def index():
     if "user_id" in session:
@@ -55,13 +58,14 @@ def index():
         return redirect(url_for("my_rides"))
     return redirect(url_for("login"))
 
+#for signup page
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
         name = request.form.get("name").strip()
         email = request.form.get("email").strip().lower()
         password = request.form.get("password")
-        role = request.form.get("role", "passenger") # passenger or admin
+        role = request.form.get("role", "passenger") 
 
         if users_col.find_one({"email": email}):
             flash("Email already registered. Please log in.", "error")
@@ -73,13 +77,16 @@ def signup():
             "email": email,
             "password": hashed_password,
             "role": role,
-            "created_at": datetime.utcnow()
+            "created_at": datetime.now(timezone.utc)
         }
         users_col.insert_one(user_doc)
         flash("Account created successfully! Please log in.", "success")
         return redirect(url_for("login"))
 
     return render_template("signup.html")
+
+
+#login page setup
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -103,6 +110,8 @@ def login():
 
     return render_template("login.html")
 
+
+#admin page routes
 @app.route("/admin/approve/<ride_id>", methods=["POST"])
 @admin_required
 def approve_ride(ride_id):
@@ -117,15 +126,15 @@ def approve_ride(ride_id):
     return redirect(url_for("admin_panel"))
 
 
-
+#login page routes
 @app.route("/logout")
 def logout():
     session.clear()
     flash("You have been logged out.", "success")
     return redirect(url_for("login"))
 
-# --- PASSENGER FEATURES (ADESH-12, ADESH-17, ADESH-20) ---
 
+#implementation of the request a ride 
 @app.route("/ride/new", methods=["GET", "POST"])
 @login_required
 def ride_request():
@@ -141,7 +150,7 @@ def ride_request():
             "dropoff_location": dropoff,
             "notes": notes,
             "status": "Pending",  # Pending, Confirmed, Completed, Cancelled
-            "created_at": datetime.utcnow()
+            "created_at": datetime.now(timezone.utc)
         }
         rides_col.insert_one(ride_doc)
         flash("Ride requested successfully!", "success")
@@ -149,6 +158,8 @@ def ride_request():
 
     return render_template("ride_request.html")
 
+
+# routes for my rides
 @app.route("/my-rides")
 @login_required
 def my_rides():
@@ -156,6 +167,7 @@ def my_rides():
     rides = list(rides_col.find({"passenger_id": user_id}).sort("created_at", -1))
     return render_template("my_rides.html", rides=rides)
 
+#routes cancel a ride
 @app.route("/ride/cancel/<ride_id>", methods=["POST"])
 @login_required
 def cancel_ride(ride_id):
@@ -170,14 +182,18 @@ def cancel_ride(ride_id):
         flash("Cannot cancel ride or ride not found.", "error")
     return redirect(url_for("my_rides"))
 
-# --- ADMIN FEATURES (ADESH-24, ADESH-27) ---
 
+
+
+# admin page calls
 @app.route("/admin")
 @admin_required
 def admin_panel():
     rides = list(rides_col.find().sort("created_at", -1))
     return render_template("admin_panel.html", rides=rides)
 
+
+# delete routes for admin
 @app.route("/admin/delete/<ride_id>", methods=["POST"])
 @admin_required
 def delete_ride(ride_id):
@@ -188,5 +204,7 @@ def delete_ride(ride_id):
         flash("Record not found.", "error")
     return redirect(url_for("admin_panel"))
 
+
+#runs the app
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
