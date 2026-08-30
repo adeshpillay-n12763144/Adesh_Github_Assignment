@@ -1,4 +1,7 @@
-/* Global Reset & Typography */
+
+/*One Coherent Style Structure of the Entire Application*/
+
+/* General layout implementation*/
 * { 
   box-sizing: border-box; 
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
@@ -13,6 +16,7 @@ body {
   display: flex;
   flex-direction: column;
 }
+
 
 /* Navbar Layout */
 .navbar { 
@@ -62,7 +66,7 @@ body {
   color: #ffffff; 
 }
 
-/* Nav Action Buttons & Admin Badge */
+/* Nav Action Buttons & Admin Badge Implementation */
 .nav-auth {
   display: flex;
   align-items: center;
@@ -102,7 +106,8 @@ body {
   font-weight: 600 !important;
 }
 
-/* Container Layouts */
+
+/* General Container Layouts */
 .container { 
   width: 100%;
   max-width: 1000px; 
@@ -202,7 +207,9 @@ input:focus, select:focus, textarea:focus {
   text-decoration: underline;
 }
 
-/* Alerts */
+
+
+/* Alerts Highlights*/
 .alert { 
   padding: 10px 15px; 
   border-radius: 6px; 
@@ -212,7 +219,9 @@ input:focus, select:focus, textarea:focus {
 .alert.success { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
 .alert.error { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
 
-/* Dashboard Tables & Badges */
+
+
+/* Dashboard Tables Style Formats */
 .table-header {
   display: flex;
   justify-content: space-between;
